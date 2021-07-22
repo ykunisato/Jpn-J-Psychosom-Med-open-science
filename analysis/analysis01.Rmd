@@ -1,0 +1,38 @@
+---
+title: "BioPsychoSocial Medicineにおけるオープンサイエンスの現状"
+author: "国里愛彦（専修大学人間科学部心理学科），遠山朝子（専修大学大学院文学研究科心理学専攻・日本学術振興会特別研究員PD）"
+output: 
+  html_document:
+    toc: true
+    toc_depth: 2
+    toc_float: true
+    number_section: true
+    keep_md: true
+---
+
+コードブック用のメモ
+
+paper:
+type:
+with_data:(データを扱っている=1,扱っていない=0)Reviewは0とする。
+pre_registered： 無し=0，有り=1,　事後登録=2
+where_pre-registered：事前登録サイト
+share_data：有り=1, 無し=0
+where_share_data：登録場所と実態
+share_code：有り=1, 無し=0
+where_share_code：登録場所と実態
+
+# 使用するRパッケージ
+
+```{r message=FALSE, warning=FALSE}
+library(tidyverse)
+```
+
+
+# データの読み込み
+
+```{r message=FALSE, warning=FALSE}
+setwd("../data")
+data <- read_csv("data.csv")
+```
+
