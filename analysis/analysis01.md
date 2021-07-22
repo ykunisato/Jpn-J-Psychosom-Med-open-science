@@ -10,23 +10,21 @@ output:
     keep_md: true
 ---
 
-コードブック用のメモ
-
+変数メモ
 paper:
 type:
 with_data:(データを扱っている=1,扱っていない=0)Reviewは0とする。
-pre_registered： 無し=0，有り=1,　事後登録=2
+pre_registered： 事前登録なし，事前登録あり，事後登録あり
 where_pre-registered：事前登録サイト
-share_data：有り=1, 無し=0
-where_share_data：登録場所と実態
-share_code：有り=1, 無し=0
-where_share_code：登録場所と実態
+share_data：
+share_code：
 
 # 使用するRパッケージ
 
 
 ```r
 library(tidyverse)
+library(ggrepel)
 ```
 
 
@@ -38,3 +36,93 @@ setwd("../data")
 data <- read_csv("data.csv")
 ```
 
+# 事前登録
+
+
+```r
+data %>% 
+  filter(with_data == 1) %>% 
+  select(pre_registered) %>% 
+  mutate(n = 1) %>% 
+  group_by(pre_registered) %>% 
+  summarize(total = sum(n)) %>% 
+  mutate(percentage = total/sum(total)) %>% 
+  mutate(label = paste0(pre_registered, "\n", scales::percent(percentage, 0.1))) %>%
+  ggplot(aes(x = "", y = total, fill = factor(total))) +
+    geom_col() + 
+    coord_polar("y") +
+    geom_text_repel(aes(label = label), position = position_stack(vjust = 0.5)) +
+    theme_void() + 
+    theme(legend.position = "none")
+```
+
+![](analysis01_files/figure-html/unnamed-chunk-3-1.png)<!-- -->
+
+# 事前登録で用いたリポジトリ
+
+
+```r
+data %>% 
+  filter(with_data == 1 & pre_registered != "事前登録なし") %>% 
+  select(where_pre_registered) %>% 
+  mutate(n = 1) %>% 
+  group_by(where_pre_registered) %>% 
+  summarize(total = sum(n)) %>% 
+  mutate(percentage = total/sum(total)) %>% 
+  mutate(label = paste0(where_pre_registered, "\n", scales::percent(percentage, 0.1))) %>%
+  ggplot(aes(x = "", y = total, fill = factor(total))) +
+    geom_col() + 
+    coord_polar("y") +
+    geom_text_repel(aes(label = label), position = position_stack(vjust = 0.5)) +
+    theme_void() + 
+    theme(legend.position = "none")
+```
+
+![](analysis01_files/figure-html/unnamed-chunk-4-1.png)<!-- -->
+
+
+# データ共有
+
+重なりを解消したい・・・
+
+
+```r
+data %>% 
+  filter(with_data == 1) %>% 
+  select(share_data) %>% 
+  mutate(n = 1) %>% 
+  group_by(share_data) %>% 
+  summarize(total = sum(n)) %>% 
+  mutate(percentage = total/sum(total)) %>% 
+  mutate(label = paste0(share_data, "\n", scales::percent(percentage, 0.1))) %>%
+  ggplot(aes(x = "", y = total, fill = factor(total))) +
+    geom_col() + 
+    coord_polar("y") +
+    geom_text(aes(label = label), position = position_stack(vjust = 0.5)) +
+    theme_void() + 
+    theme(legend.position = "none")
+```
+
+![](analysis01_files/figure-html/unnamed-chunk-5-1.png)<!-- -->
+
+# コード共有
+
+
+```r
+data %>% 
+  filter(with_data == 1) %>% 
+  select(share_code) %>% 
+  mutate(n = 1) %>% 
+  group_by(share_code) %>% 
+  summarize(total = sum(n)) %>% 
+  mutate(percentage = total/sum(total)) %>% 
+  mutate(label = paste0(share_code, "\n", scales::percent(percentage, 0.1))) %>%
+  ggplot(aes(x = "", y = total, fill = factor(total))) +
+    geom_col() + 
+    coord_polar("y") +
+    geom_text_repel(aes(label = label), position = position_stack(vjust = 0.5)) +
+    theme_void() + 
+    theme(legend.position = "none")
+```
+
+![](analysis01_files/figure-html/unnamed-chunk-6-1.png)<!-- -->
