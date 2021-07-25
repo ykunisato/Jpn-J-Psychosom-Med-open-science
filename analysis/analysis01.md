@@ -9,17 +9,7 @@ output:
     number_section: true
     keep_md: true
 ---
-
-変数メモ
-paper:
-type:
-with_data:(データを扱っている=1,扱っていない=0)Reviewは0とする。
-pre_registered： 事前登録なし，事前登録あり，事後登録あり
-where_pre-registered：事前登録サイト
-share_data：
-share_code：
-
-# 使用するRパッケージ
+## 使用するRパッケージ
 
 
 ```r
@@ -28,7 +18,7 @@ library(ggrepel)
 ```
 
 
-# データの読み込み
+## データの読み込み
 
 
 ```r
@@ -36,7 +26,39 @@ setwd("../data")
 data <- read_csv("data.csv")
 ```
 
-# 事前登録
+## データ内の変数
+
+著者ら（国里・遠山）は，2019年と2020年にBioPsychoSocial Medicineに掲載された論文における，オープンサイエンス実践の状況を調査した。個々の論文の調査は，２名が独立に実施してから，統合した。独立に評価したファイルは「data」フォルダ内の「data_extraction」内にあり，統合したファイルは「data」フォルダ内のdata.csvである。以下の解析では，data.csvを用いる。data.csv内の変数と説明は以下の通りである。
+
+- paper: 論文の引用情報
+- type: 論文種別(Case report, Commentary, Correction, Editorial, Research article, Review) 
+- with_data: データを用いた研究か(1 = データを用いている, 0 = データを用いてない(Reviewやメタ分析は0とする))
+- pre_registered： 事前登録状況(事前登録なし，事前登録あり，事後登録あり)
+- where_pre_registered：事前登録に用いたサイト
+- share_data：データ共有状況(共有なし，外部リポジトリ， 著者問い合わせ，雑誌ウェブサイト，雑誌ウェブサイト(データなし）)
+- share_code：コード共有状況(共有なし，著者問い合わせ)
+
+
+## 論文種別
+
+調査対象論文の論文種別は以下のようになる。Research article(40本)の内，データを用いた研究（メタ分析は除く）38本を対象に以降の検討を行う。
+
+
+```r
+table(data$type)
+```
+
+```
+## 
+##      Case report       Commentary       Correction        Editorial 
+##                5                1                2                1 
+## Research article           Review 
+##               40               12
+```
+
+## 事前登録
+
+事前登録状況を円グラフで示す。
 
 
 ```r
@@ -47,18 +69,24 @@ data %>%
   group_by(pre_registered) %>% 
   summarize(total = sum(n)) %>% 
   mutate(percentage = total/sum(total)) %>% 
-  mutate(label = paste0(pre_registered, "\n", scales::percent(percentage, 0.1))) %>%
-  ggplot(aes(x = "", y = total, fill = factor(total))) +
-    geom_col() + 
-    coord_polar("y") +
-    geom_text_repel(aes(label = label), position = position_stack(vjust = 0.5)) +
-    theme_void() + 
-    theme(legend.position = "none")
+  ggplot(aes(x = "", y = total, fill = reorder(pre_registered, -total))) +
+  geom_bar(width = 1, stat = "identity", color = "white") +
+  coord_polar(theta = "y", direction = -1) +
+  theme_bw(base_family = "HiraKakuPro-W3") +
+  labs(fill = "事前登録") +
+  theme(axis.ticks = element_blank(),
+        axis.text = element_blank(),
+        panel.grid = element_blank(),
+        panel.border = element_blank()) +
+  xlab("") + ylab("") +
+  geom_text(aes(x = 1, label = sprintf("%0.2f", round(percentage, digits = 2))), position = position_stack(vjust = 0.5))
 ```
 
-![](analysis01_files/figure-html/unnamed-chunk-3-1.png)<!-- -->
+![](analysis01_files/figure-html/unnamed-chunk-4-1.png)<!-- -->
 
-# 事前登録で用いたリポジトリ
+## 事前登録で用いたリポジトリ
+
+事前（もしくは事後）登録をしていた研究の内，事前登録で用いたリポジトリの使用状況を円グラフで示す。
 
 
 ```r
@@ -69,21 +97,25 @@ data %>%
   group_by(where_pre_registered) %>% 
   summarize(total = sum(n)) %>% 
   mutate(percentage = total/sum(total)) %>% 
-  mutate(label = paste0(where_pre_registered, "\n", scales::percent(percentage, 0.1))) %>%
-  ggplot(aes(x = "", y = total, fill = factor(total))) +
-    geom_col() + 
-    coord_polar("y") +
-    geom_text_repel(aes(label = label), position = position_stack(vjust = 0.5)) +
-    theme_void() + 
-    theme(legend.position = "none")
+  ggplot(aes(x = "", y = total, fill = reorder(where_pre_registered, -total))) +
+  geom_bar(width = 1, stat = "identity", color = "white") +
+  coord_polar(theta = "y", direction = -1) +
+  theme_bw(base_family = "HiraKakuPro-W3") +
+  labs(fill = "事前登録リポジトリ") +
+  theme(axis.ticks = element_blank(),
+        axis.text = element_blank(),
+        panel.grid = element_blank(),
+        panel.border = element_blank()) +
+  xlab("") + ylab("") +
+  geom_text(aes(x = 1, label = sprintf("%0.2f", round(percentage, digits = 2))), position = position_stack(vjust = 0.5))
 ```
 
-![](analysis01_files/figure-html/unnamed-chunk-4-1.png)<!-- -->
+![](analysis01_files/figure-html/unnamed-chunk-5-1.png)<!-- -->
 
 
-# データ共有
+## データ共有
 
-重なりを解消したい・・・
+データ共有状況を円グラフで示す。
 
 
 ```r
@@ -94,18 +126,24 @@ data %>%
   group_by(share_data) %>% 
   summarize(total = sum(n)) %>% 
   mutate(percentage = total/sum(total)) %>% 
-  mutate(label = paste0(share_data, "\n", scales::percent(percentage, 0.1))) %>%
-  ggplot(aes(x = "", y = total, fill = factor(total))) +
-    geom_col() + 
-    coord_polar("y") +
-    geom_text(aes(label = label), position = position_stack(vjust = 0.5)) +
-    theme_void() + 
-    theme(legend.position = "none")
+  ggplot(aes(x = "", y = total, fill = reorder(share_data, -total))) +
+  geom_bar(width = 1, stat = "identity", color = "white") +
+  coord_polar(theta = "y", direction = -1) +
+  theme_bw(base_family = "HiraKakuPro-W3") +
+  labs(fill = "データ共有") +
+  theme(axis.ticks = element_blank(),
+        axis.text = element_blank(),
+        panel.grid = element_blank(),
+        panel.border = element_blank()) +
+  xlab("") + ylab("") +
+  geom_text_repel(aes(x = 1, label = sprintf("%0.2f", round(percentage, digits = 2))), position = position_stack(vjust = 0.5))
 ```
 
-![](analysis01_files/figure-html/unnamed-chunk-5-1.png)<!-- -->
+![](analysis01_files/figure-html/unnamed-chunk-6-1.png)<!-- -->
 
-# コード共有
+## コード共有
+
+コード共有状況を円グラフで示す。
 
 
 ```r
@@ -115,14 +153,18 @@ data %>%
   mutate(n = 1) %>% 
   group_by(share_code) %>% 
   summarize(total = sum(n)) %>% 
-  mutate(percentage = total/sum(total)) %>% 
-  mutate(label = paste0(share_code, "\n", scales::percent(percentage, 0.1))) %>%
-  ggplot(aes(x = "", y = total, fill = factor(total))) +
-    geom_col() + 
-    coord_polar("y") +
-    geom_text_repel(aes(label = label), position = position_stack(vjust = 0.5)) +
-    theme_void() + 
-    theme(legend.position = "none")
+  mutate(percentage = total/sum(total)) %>%
+  ggplot(aes(x = "", y = total, fill = reorder(share_code, -total))) +
+  geom_bar(width = 1, stat = "identity", color = "white") +
+  coord_polar(theta = "y", direction = -1) +
+  theme_bw(base_family = "HiraKakuPro-W3") +
+  labs(fill = "コード共有") +
+  theme(axis.ticks = element_blank(),
+        axis.text = element_blank(),
+        panel.grid = element_blank(),
+        panel.border = element_blank()) +
+  xlab("") + ylab("") +
+  geom_text(aes(x = 1, label = sprintf("%0.2f", round(percentage, digits = 2))), position = position_stack(vjust = 0.5))
 ```
 
-![](analysis01_files/figure-html/unnamed-chunk-6-1.png)<!-- -->
+![](analysis01_files/figure-html/unnamed-chunk-7-1.png)<!-- -->
