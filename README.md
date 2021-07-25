@@ -23,4 +23,4 @@ Please cite "Kunisato and Toyama (2021). Survey of open science practices in Bio
 
 ### How to use
 
-Open the "analysis01.Rmd" in "analysis" folder and run it.
+Open the ["analysis01.Rmd"](analysis/analysis01.Rmd) in  "analysis" folder and run it.

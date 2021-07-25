@@ -21,4 +21,4 @@
 
 ### 使用法
 
-「analysis」フォルダ内の"analysis01.Rmd"を開いて，実行してください。
+「analysis」フォルダ内の[「analysis01.Rmd」](analysis/analysis01.Rmd)を開いて，実行してください。
