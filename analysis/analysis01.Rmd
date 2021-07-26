@@ -86,7 +86,7 @@ data %>%
   geom_bar(width = 1, stat = "identity", color = "white") +
   coord_polar(theta = "y", direction = -1) +
   theme_bw(base_family = "HiraKakuPro-W3") +
-  labs(fill = "事前登録リポジトリ") +
+  labs(fill = "登録リポジトリ") +
   theme(axis.ticks = element_blank(),
         axis.text = element_blank(),
         panel.grid = element_blank(),
@@ -136,7 +136,7 @@ data %>%
   ggplot(aes(x = "", y = total, fill = reorder(share_code, -total))) +
   geom_bar(width = 1, stat = "identity", color = "white") +
   coord_polar(theta = "y", direction = -1) +
-  theme_bw(base_family = "HiraKakuPro-W3") +
+  theme_bw(base_family = "Noto Sans CJK JP") +
   labs(fill = "コード共有") +
   theme(axis.ticks = element_blank(),
         axis.text = element_blank(),
@@ -145,3 +145,56 @@ data %>%
   xlab("") + ylab("") +
   geom_text(aes(x = 1, label = sprintf("%0.2f", round(percentage, digits = 2))), position = position_stack(vjust = 0.5))
 ```
+
+## 論文に掲載する図の作成コード
+
+### Figure 1
+
+```{r}
+p1 <- data %>% 
+  filter(with_data == 1) %>% 
+  select(pre_registered) %>% 
+  mutate(n = 1) %>% 
+  group_by(pre_registered) %>% 
+  summarize(total = sum(n)) %>% 
+  mutate(percentage = total/sum(total)) %>% 
+  ggplot(aes(x = "", y = total, fill = reorder(pre_registered, -total))) +
+  geom_bar(width = 1, stat = "identity", color = "white") +
+  coord_polar(theta = "y", direction = -1) +
+  theme_bw(base_family = "HiraKakuPro-W3") +
+  labs(fill = "事前登録") +
+  theme(axis.ticks = element_blank(),
+        axis.text = element_blank(),
+        panel.grid = element_blank(),
+        panel.border = element_blank()) +
+  xlab("") + ylab("") +
+  geom_text(aes(x = 1, label = sprintf("%0.2f", round(percentage, digits = 2))), position = position_stack(vjust = 0.5))
+
+p2 <- data %>% 
+  filter(with_data == 1 & pre_registered != "事前登録なし") %>% 
+  select(where_pre_registered) %>% 
+  mutate(n = 1) %>% 
+  group_by(where_pre_registered) %>% 
+  summarize(total = sum(n)) %>% 
+  mutate(percentage = total/sum(total)) %>% 
+  ggplot(aes(x = "", y = total, fill = reorder(where_pre_registered, -total))) +
+  geom_bar(width = 1, stat = "identity", color = "white") +
+  coord_polar(theta = "y", direction = -1) +
+  theme_bw(base_family = "HiraKakuPro-W3") +
+  labs(fill = "登録リポジトリ") +
+  theme(axis.ticks = element_blank(),
+        axis.text = element_blank(),
+        panel.grid = element_blank(),
+        panel.border = element_blank()) +
+  xlab("") + ylab("") +
+  geom_text(aes(x = 1, label = sprintf("%0.2f", round(percentage, digits = 2))), position = position_stack(vjust = 0.5))
+
+gridExtra::grid.arrange(p1, p2)
+```
+
+### Figure 2
+
+```{r}
+
+```
+
