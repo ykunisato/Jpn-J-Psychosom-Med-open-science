@@ -14,6 +14,8 @@ output:
 ```{r message=FALSE, warning=FALSE}
 library(tidyverse)
 library(ggrepel)
+library(gridExtra)
+library(knitr)
 ```
 
 
@@ -42,7 +44,7 @@ data <- read_csv("data.csv")
 調査対象論文の論文種別は以下のようになる。Research article(40本)の内，データを用いた研究（メタ分析は除く）38本を対象に以降の検討を行う。
 
 ```{r}
-table(data$type)
+kable(table(data$type))
 ```
 
 ## 事前登録
@@ -60,7 +62,7 @@ data %>%
   ggplot(aes(x = "", y = total, fill = reorder(pre_registered, -total))) +
   geom_bar(width = 1, stat = "identity", color = "white") +
   coord_polar(theta = "y", direction = -1) +
-  theme_bw(base_family = "HiraKakuPro-W3") +
+  theme_bw(base_family = "Noto Sans CJK JP") +
   labs(fill = "事前登録") +
   theme(axis.ticks = element_blank(),
         axis.text = element_blank(),
@@ -85,7 +87,7 @@ data %>%
   ggplot(aes(x = "", y = total, fill = reorder(where_pre_registered, -total))) +
   geom_bar(width = 1, stat = "identity", color = "white") +
   coord_polar(theta = "y", direction = -1) +
-  theme_bw(base_family = "HiraKakuPro-W3") +
+  theme_bw(base_family = "Noto Sans CJK JP") +
   labs(fill = "登録リポジトリ") +
   theme(axis.ticks = element_blank(),
         axis.text = element_blank(),
@@ -111,7 +113,7 @@ data %>%
   ggplot(aes(x = "", y = total, fill = reorder(share_data, -total))) +
   geom_bar(width = 1, stat = "identity", color = "white") +
   coord_polar(theta = "y", direction = -1) +
-  theme_bw(base_family = "HiraKakuPro-W3") +
+  theme_bw(base_family = "Noto Sans CJK JP") +
   labs(fill = "データ共有") +
   theme(axis.ticks = element_blank(),
         axis.text = element_blank(),
@@ -161,14 +163,15 @@ p1 <- data %>%
   ggplot(aes(x = "", y = total, fill = reorder(pre_registered, -total))) +
   geom_bar(width = 1, stat = "identity", color = "white") +
   coord_polar(theta = "y", direction = -1) +
-  theme_bw(base_family = "HiraKakuPro-W3") +
+  theme_bw(base_family = "Noto Sans CJK JP") +
   labs(fill = "事前登録") +
   theme(axis.ticks = element_blank(),
         axis.text = element_blank(),
         panel.grid = element_blank(),
         panel.border = element_blank()) +
   xlab("") + ylab("") +
-  geom_text(aes(x = 1, label = sprintf("%0.2f", round(percentage, digits = 2))), position = position_stack(vjust = 0.5))
+  geom_text(aes(x = 1, label = sprintf("%0.2f", round(percentage, digits = 2))), position = position_stack(vjust = 0.5))+
+  ggtitle("A") 
 
 p2 <- data %>% 
   filter(with_data == 1 & pre_registered != "事前登録なし") %>% 
@@ -180,21 +183,62 @@ p2 <- data %>%
   ggplot(aes(x = "", y = total, fill = reorder(where_pre_registered, -total))) +
   geom_bar(width = 1, stat = "identity", color = "white") +
   coord_polar(theta = "y", direction = -1) +
-  theme_bw(base_family = "HiraKakuPro-W3") +
+  theme_bw(base_family = "Noto Sans CJK JP") +
   labs(fill = "登録リポジトリ") +
   theme(axis.ticks = element_blank(),
         axis.text = element_blank(),
         panel.grid = element_blank(),
         panel.border = element_blank()) +
   xlab("") + ylab("") +
-  geom_text(aes(x = 1, label = sprintf("%0.2f", round(percentage, digits = 2))), position = position_stack(vjust = 0.5))
+  geom_text(aes(x = 1, label = sprintf("%0.2f", round(percentage, digits = 2))), position = position_stack(vjust = 0.5))+
+  ggtitle("B") 
 
-gridExtra::grid.arrange(p1, p2)
+grid.arrange(p1, p2, nrow = 1)
 ```
 
 ### Figure 2
 
 ```{r}
+p3 <- data %>% 
+  filter(with_data == 1) %>% 
+  select(share_data) %>% 
+  mutate(n = 1) %>% 
+  group_by(share_data) %>% 
+  summarize(total = sum(n)) %>% 
+  mutate(percentage = total/sum(total)) %>% 
+  ggplot(aes(x = "", y = total, fill = reorder(share_data, -total))) +
+  geom_bar(width = 1, stat = "identity", color = "white") +
+  coord_polar(theta = "y", direction = -1) +
+  theme_bw(base_family = "Noto Sans CJK JP") +
+  labs(fill = "データ共有") +
+  theme(axis.ticks = element_blank(),
+        axis.text = element_blank(),
+        panel.grid = element_blank(),
+        panel.border = element_blank()) +
+  xlab("") + ylab("") +
+  geom_text_repel(aes(x = 1, label = sprintf("%0.2f", round(percentage, digits = 2))), position = position_stack(vjust = 0.5)) +
+  ggtitle("A") 
+  
+  
+p4 <- data %>% 
+  filter(with_data == 1) %>% 
+  select(share_code) %>% 
+  mutate(n = 1) %>% 
+  group_by(share_code) %>% 
+  summarize(total = sum(n)) %>% 
+  mutate(percentage = total/sum(total)) %>%
+  ggplot(aes(x = "", y = total, fill = reorder(share_code, -total))) +
+  geom_bar(width = 1, stat = "identity", color = "white") +
+  coord_polar(theta = "y", direction = -1) +
+  theme_bw(base_family = "Noto Sans CJK JP") +
+  labs(fill = "コード共有") +
+  theme(axis.ticks = element_blank(),
+        axis.text = element_blank(),
+        panel.grid = element_blank(),
+        panel.border = element_blank()) +
+  xlab("") + ylab("") +
+  geom_text(aes(x = 1, label = sprintf("%0.2f", round(percentage, digits = 2))), position = position_stack(vjust = 0.5))　+
+  ggtitle("B") 
 
+grid.arrange(p3, p4, widths=c(1,0.9), nrow = 1)
 ```
-

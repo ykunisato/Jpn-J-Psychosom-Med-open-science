@@ -15,6 +15,8 @@ output:
 ```r
 library(tidyverse)
 library(ggrepel)
+library(gridExtra)
+library(knitr)
 ```
 
 
@@ -45,16 +47,19 @@ data <- read_csv("data.csv")
 
 
 ```r
-table(data$type)
+kable(table(data$type))
 ```
 
-```
-## 
-##      Case report       Commentary       Correction        Editorial 
-##                5                1                2                1 
-## Research article           Review 
-##               40               12
-```
+
+
+|Var1             | Freq|
+|:----------------|----:|
+|Case report      |    5|
+|Commentary       |    1|
+|Correction       |    2|
+|Editorial        |    1|
+|Research article |   40|
+|Review           |   12|
 
 ## 事前登録
 
@@ -72,7 +77,7 @@ data %>%
   ggplot(aes(x = "", y = total, fill = reorder(pre_registered, -total))) +
   geom_bar(width = 1, stat = "identity", color = "white") +
   coord_polar(theta = "y", direction = -1) +
-  theme_bw(base_family = "HiraKakuPro-W3") +
+  theme_bw(base_family = "Noto Sans CJK JP") +
   labs(fill = "事前登録") +
   theme(axis.ticks = element_blank(),
         axis.text = element_blank(),
@@ -100,8 +105,8 @@ data %>%
   ggplot(aes(x = "", y = total, fill = reorder(where_pre_registered, -total))) +
   geom_bar(width = 1, stat = "identity", color = "white") +
   coord_polar(theta = "y", direction = -1) +
-  theme_bw(base_family = "HiraKakuPro-W3") +
-  labs(fill = "事前登録リポジトリ") +
+  theme_bw(base_family = "Noto Sans CJK JP") +
+  labs(fill = "登録リポジトリ") +
   theme(axis.ticks = element_blank(),
         axis.text = element_blank(),
         panel.grid = element_blank(),
@@ -129,7 +134,7 @@ data %>%
   ggplot(aes(x = "", y = total, fill = reorder(share_data, -total))) +
   geom_bar(width = 1, stat = "identity", color = "white") +
   coord_polar(theta = "y", direction = -1) +
-  theme_bw(base_family = "HiraKakuPro-W3") +
+  theme_bw(base_family = "Noto Sans CJK JP") +
   labs(fill = "データ共有") +
   theme(axis.ticks = element_blank(),
         axis.text = element_blank(),
@@ -157,7 +162,7 @@ data %>%
   ggplot(aes(x = "", y = total, fill = reorder(share_code, -total))) +
   geom_bar(width = 1, stat = "identity", color = "white") +
   coord_polar(theta = "y", direction = -1) +
-  theme_bw(base_family = "HiraKakuPro-W3") +
+  theme_bw(base_family = "Noto Sans CJK JP") +
   labs(fill = "コード共有") +
   theme(axis.ticks = element_blank(),
         axis.text = element_blank(),
@@ -168,3 +173,104 @@ data %>%
 ```
 
 ![](analysis01_files/figure-html/unnamed-chunk-7-1.png)<!-- -->
+
+## 論文に掲載する図の作成コード
+
+### Figure 1
+
+
+```r
+p1 <- data %>% 
+  filter(with_data == 1) %>% 
+  select(pre_registered) %>% 
+  mutate(n = 1) %>% 
+  group_by(pre_registered) %>% 
+  summarize(total = sum(n)) %>% 
+  mutate(percentage = total/sum(total)) %>% 
+  ggplot(aes(x = "", y = total, fill = reorder(pre_registered, -total))) +
+  geom_bar(width = 1, stat = "identity", color = "white") +
+  coord_polar(theta = "y", direction = -1) +
+  theme_bw(base_family = "Noto Sans CJK JP") +
+  labs(fill = "事前登録") +
+  theme(axis.ticks = element_blank(),
+        axis.text = element_blank(),
+        panel.grid = element_blank(),
+        panel.border = element_blank()) +
+  xlab("") + ylab("") +
+  geom_text(aes(x = 1, label = sprintf("%0.2f", round(percentage, digits = 2))), position = position_stack(vjust = 0.5))+
+  ggtitle("A") 
+
+p2 <- data %>% 
+  filter(with_data == 1 & pre_registered != "事前登録なし") %>% 
+  select(where_pre_registered) %>% 
+  mutate(n = 1) %>% 
+  group_by(where_pre_registered) %>% 
+  summarize(total = sum(n)) %>% 
+  mutate(percentage = total/sum(total)) %>% 
+  ggplot(aes(x = "", y = total, fill = reorder(where_pre_registered, -total))) +
+  geom_bar(width = 1, stat = "identity", color = "white") +
+  coord_polar(theta = "y", direction = -1) +
+  theme_bw(base_family = "Noto Sans CJK JP") +
+  labs(fill = "登録リポジトリ") +
+  theme(axis.ticks = element_blank(),
+        axis.text = element_blank(),
+        panel.grid = element_blank(),
+        panel.border = element_blank()) +
+  xlab("") + ylab("") +
+  geom_text(aes(x = 1, label = sprintf("%0.2f", round(percentage, digits = 2))), position = position_stack(vjust = 0.5))+
+  ggtitle("B") 
+
+grid.arrange(p1, p2, nrow = 1)
+```
+
+![](analysis01_files/figure-html/unnamed-chunk-8-1.png)<!-- -->
+
+### Figure 2
+
+
+```r
+p3 <- data %>% 
+  filter(with_data == 1) %>% 
+  select(share_data) %>% 
+  mutate(n = 1) %>% 
+  group_by(share_data) %>% 
+  summarize(total = sum(n)) %>% 
+  mutate(percentage = total/sum(total)) %>% 
+  ggplot(aes(x = "", y = total, fill = reorder(share_data, -total))) +
+  geom_bar(width = 1, stat = "identity", color = "white") +
+  coord_polar(theta = "y", direction = -1) +
+  theme_bw(base_family = "Noto Sans CJK JP") +
+  labs(fill = "データ共有") +
+  theme(axis.ticks = element_blank(),
+        axis.text = element_blank(),
+        panel.grid = element_blank(),
+        panel.border = element_blank()) +
+  xlab("") + ylab("") +
+  geom_text_repel(aes(x = 1, label = sprintf("%0.2f", round(percentage, digits = 2))), position = position_stack(vjust = 0.5)) +
+  ggtitle("A") 
+  
+  
+p4 <- data %>% 
+  filter(with_data == 1) %>% 
+  select(share_code) %>% 
+  mutate(n = 1) %>% 
+  group_by(share_code) %>% 
+  summarize(total = sum(n)) %>% 
+  mutate(percentage = total/sum(total)) %>%
+  ggplot(aes(x = "", y = total, fill = reorder(share_code, -total))) +
+  geom_bar(width = 1, stat = "identity", color = "white") +
+  coord_polar(theta = "y", direction = -1) +
+  theme_bw(base_family = "Noto Sans CJK JP") +
+  labs(fill = "コード共有") +
+  theme(axis.ticks = element_blank(),
+        axis.text = element_blank(),
+        panel.grid = element_blank(),
+        panel.border = element_blank()) +
+  xlab("") + ylab("") +
+  geom_text(aes(x = 1, label = sprintf("%0.2f", round(percentage, digits = 2))), position = position_stack(vjust = 0.5))　+
+  ggtitle("B") 
+
+grid.arrange(p3, p4, widths=c(1,0.9), nrow = 1)
+```
+
+![](analysis01_files/figure-html/unnamed-chunk-9-1.png)<!-- -->
