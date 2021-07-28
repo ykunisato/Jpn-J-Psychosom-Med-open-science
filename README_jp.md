@@ -8,7 +8,7 @@
 
 [![License: CC BY 4.0](https://licensebuttons.net/l/by/4.0/80x15.png)](https://creativecommons.org/licenses/by/4.0/)
 
-"Kunisato and Toyama (2021). Survey of open science practices in BioPsychoSocial Medicine doi:10.5281/zenodo.5136279"を引用ください。
+"Kunisato Y., Toyama A. (2021). Survey of open science practices in BioPsychoSocial Medicine (version 1.0.0). DOI: https://doi.org/10.5281/zenodo.5136279"を引用ください。
 
 ### DOI
 
