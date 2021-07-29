@@ -191,6 +191,7 @@ p1 <- data %>%
   geom_bar(width = 1, stat = "identity", color = "white") +
   coord_polar(theta = "y", direction = -1) +
   theme_bw(base_family = "Noto Sans CJK JP") +
+  scale_fill_grey(start = 0.6, end = 0.9) + 
   labs(fill = "事前登録") +
   theme(axis.ticks = element_blank(),
         axis.text = element_blank(),
@@ -211,6 +212,7 @@ p2 <- data %>%
   geom_bar(width = 1, stat = "identity", color = "white") +
   coord_polar(theta = "y", direction = -1) +
   theme_bw(base_family = "Noto Sans CJK JP") +
+  scale_fill_grey(start = 0.6, end = 0.9) + 
   labs(fill = "登録リポジトリ") +
   theme(axis.ticks = element_blank(),
         axis.text = element_blank(),
@@ -240,6 +242,7 @@ p3 <- data %>%
   geom_bar(width = 1, stat = "identity", color = "white") +
   coord_polar(theta = "y", direction = -1) +
   theme_bw(base_family = "Noto Sans CJK JP") +
+  scale_fill_grey(start = 0.6, end = 0.9) + 
   labs(fill = "データ共有") +
   theme(axis.ticks = element_blank(),
         axis.text = element_blank(),
@@ -261,6 +264,7 @@ p4 <- data %>%
   geom_bar(width = 1, stat = "identity", color = "white") +
   coord_polar(theta = "y", direction = -1) +
   theme_bw(base_family = "Noto Sans CJK JP") +
+  scale_fill_grey(start = 0.6, end = 0.9) + 
   labs(fill = "コード共有") +
   theme(axis.ticks = element_blank(),
         axis.text = element_blank(),
